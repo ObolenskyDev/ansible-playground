@@ -1,0 +1,15 @@
+---
+- name: Install Nginx on localhost
+  hosts: all
+  become: true  # Это значит "выполнять от имени sudo"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600 # Не обновлять, если обновляли час назад
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
