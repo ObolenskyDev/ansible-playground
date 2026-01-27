@@ -13,3 +13,9 @@
 2. Запустить плейбук:
    ```bash
    ansible-playbook -i hosts.ini install_nginx.yml -K
+
+## 📊 Мониторинг ресурсов
+Развернут стек Prometheus + Grafana + Node Exporter.
+Сбор метрик системы (CPU, RAM, Disk) в реальном времени.
+
+![Grafana Dashboard](./assets/monitoring_dashboard.png)
