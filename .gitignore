@@ -6,3 +6,4 @@
 *.key
 *.pem
 id_rsa
+.env

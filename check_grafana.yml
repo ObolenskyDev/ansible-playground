@@ -1,0 +1,17 @@
+---
+- name: Check if Grafana is alive
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Wait for Grafana to respond on port 3000
+      uri:
+        url: "http://127.0.0.1:3000/api/health"
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 5
+      delay: 5
+
+    - name: Print success message
+      debug:
+        msg: "Grafana is UP and Healthy! [{{ result.status }}]"
