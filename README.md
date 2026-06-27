@@ -49,11 +49,17 @@ docker compose up -d --build
 
 ## Дашборды Grafana
 
-- **Node Exporter Full (ID 1860)** — CPU, память, диск, сеть хоста
-- **Flask Service (RED)** — Request rate, Error rate, Duration (p95)
-- **Infrastructure Overview** — сводка: статусы целей, CPU, RAM, load
+**Infrastructure Overview** — сводка: статусы целей, CPU, RAM, load
 
 ![Infrastructure Overview](./assets/infra-overview.png)
+
+**Node Exporter Full (ID 1860)** — CPU, память, диск, сеть хоста
+
+![Node Exporter Full](./assets/node-exporter-full.png)
+
+**Flask Service (RED)** — Request rate, Error rate, Duration (p95)
+
+![Flask Service](./assets/flask-service.png)
 
 ## Алертинг
 
