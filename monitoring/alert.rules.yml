@@ -1,0 +1,30 @@
+groups:
+  - name: node_alerts
+    rules:
+
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Инстанс {{ $labels.instance }} недоступен"
+          description: "{{ $labels.job }} не отвечает больше 1 минуты"
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокая нагрузка CPU на {{ $labels.instance }}"
+          description: "CPU > 80% в течение 5 минут"
+
+      - alert: HighMemoryUsage
+        expr: (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокое потребление RAM на {{ $labels.instance }}"
+          description: "RAM > 85% в течение 5 минут"
