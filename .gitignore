@@ -1,0 +1,18 @@
+# Секреты — никогда не коммитим
+monitoring/alertmanager.yml
+monitoring/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.db
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

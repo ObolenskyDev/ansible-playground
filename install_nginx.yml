@@ -1,0 +1,74 @@
+---
+- name: Install and configure Nginx
+  hosts: all
+  become: true
+
+  vars:
+    nginx_worker_processes: auto
+    nginx_worker_connections: 1024
+    nginx_keepalive_timeout: 65
+    nginx_server_tokens: "off"
+
+  handlers:
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded
+
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Ensure Nginx is started and enabled
+      service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: Set worker_processes
+      lineinfile:
+        path: /etc/nginx/nginx.conf
+        regexp: '^(\s*)worker_processes\s+'
+        line: 'worker_processes {{ nginx_worker_processes }};'
+        backrefs: true
+      notify: reload nginx
+
+    - name: Set worker_connections
+      lineinfile:
+        path: /etc/nginx/nginx.conf
+        regexp: '^(\s*)worker_connections\s+'
+        line: '        worker_connections {{ nginx_worker_connections }};'
+        backrefs: true
+      notify: reload nginx
+
+    - name: Disable server_tokens
+      lineinfile:
+        path: /etc/nginx/nginx.conf
+        insertafter: 'keepalive_timeout'
+        line: '        server_tokens {{ nginx_server_tokens }};'
+        regexp: '^\s*server_tokens'
+      notify: reload nginx
+
+    - name: Disable default site
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: reload nginx
+
+    - name: Verify Nginx config syntax
+      command: nginx -t
+      changed_when: false
+      register: nginx_check
+
+    - name: Show config test result
+      debug:
+        msg: "{{ nginx_check.stderr }}"
