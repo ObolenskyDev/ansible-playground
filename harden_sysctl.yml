@@ -1,0 +1,49 @@
+---
+- name: Apply sysctl hardening and performance tuning
+  hosts: all
+  become: true
+
+  vars:
+    sysctl_settings:
+      # Network hardening
+      net.ipv4.ip_forward: 1                    # Оставляем 1 — иначе ломается Docker networking
+      net.ipv4.conf.all.accept_redirects: 0
+      net.ipv4.conf.all.send_redirects: 0
+      net.ipv4.conf.all.rp_filter: 1
+      net.ipv4.tcp_syncookies: 1
+      net.ipv6.conf.all.accept_redirects: 0
+      # fanotify limits (для антивирусных агентов с on-access scanning)
+      fs.fanotify.max_user_instances: 32768
+      fs.fanotify.max_queued_events: 32768
+      # File descriptor limits
+      fs.file-max: 2097152
+      # Reduce swappiness for servers with enough RAM
+      vm.swappiness: 10
+      # Increase inotify watches for monitoring agents
+      fs.inotify.max_user_watches: 524288
+
+  tasks:
+    - name: Apply sysctl settings
+      sysctl:
+        name: "{{ item.key }}"
+        value: "{{ item.value | string }}"
+        state: present
+        sysctl_set: true
+        reload: true
+      loop: "{{ sysctl_settings | dict2items }}"
+
+    - name: Verify critical settings applied
+      command: sysctl {{ item }}
+      loop:
+        - fs.fanotify.max_user_instances
+        - net.ipv4.tcp_syncookies
+        - vm.swappiness
+      changed_when: false
+      register: sysctl_check
+
+    - name: Show applied values
+      debug:
+        msg: "{{ item.stdout }}"
+      loop: "{{ sysctl_check.results }}"
+      loop_control:
+        label: "{{ item.item }}"
